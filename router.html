@@ -1,0 +1,119 @@
+<!-- <!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+  <title>router</title>
+<style>
+  
+</style>
+<body>
+    <a onClick="push('/a')" >a</a>
+    <a onClick="push('/b')" >b</a>
+    <a href='#/a'>a</a>
+    <a href='#/b'>b</a>
+ 
+    <script type="text/javascript">
+      window.addEventListener('hashchange', () => {
+        console.log(window.location.hash);
+      window.location.hash = path;
+
+      })
+    function push(path) {
+      history.pushState({b: path}, null, path);
+      // window.location.href = 'http://www.baidu.com'
+      window.location.hash = path;
+    }
+      window.addEventListener('popstate', (e) => {
+        console.log(e, 'e');
+        console.log(history.length);
+      })
+    </script>
+  </body>
+  </head>
+  </html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="author" content="">
+    <title>原生模拟 Vue 路由切换</title>
+    <style type="text/css">
+        .box,
+        #router-view {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <a href="/home" class="router">主页</a>
+        <a href="/mine" class="router">我的</a>
+        <a href="/team" class="router">组</a>
+    </div>
+    <div id="router-view"></div>
+    <script type="text/javascript">
+        function Vue(parameters) {
+            let vue = {};
+            vue.routes = parameters.routes || [];
+            vue.init = function() {
+                document.querySelectorAll(".router").forEach((item, index) => {
+                    item.addEventListener("click", function(e) {
+                        let event = e || window.event;
+                        event.preventDefault();
+                        window.location.hash = this.getAttribute("href");
+
+                        console.log('lalala');
+                    }, false);
+                });
+
+                window.addEventListener("hashchange", () => {
+                    vue.routerChange();
+                });
+
+                vue.routerChange();
+            };
+            vue.routerChange = () => {
+                let nowHash = window.location.hash;
+                let index = vue.routes.findIndex((item, index) => {
+                    return nowHash == ('#' + item.path);
+                });
+                if (index >= 0) {
+                    document.querySelector("#router-view").innerHTML = vue.routes[index].component;
+                } else {
+                    let defaultIndex = vue.routes.findIndex((item, index) => {
+                        return item.path == '*';
+                    });
+                    if (defaultIndex >= 0) {
+                        window.location.hash = vue.routes[defaultIndex].redirect;
+                    }
+                }
+            };
+
+            vue.init();
+        }
+
+        new Vue({
+            routes: [{
+                path: '/home',
+                component: "<h1>主页</h1>"
+            }, {
+                path: '/mine',
+                component: "<h1>我的</h1>"
+            }, {
+                path: '/team',
+                component: '<h1>组</h1>'
+            }, {
+                path: '*',
+                redirect: '/home'
+            }]
+        });
+    </script>
+</body>
+
+</html>
